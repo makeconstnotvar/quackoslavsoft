@@ -18,9 +18,9 @@ The production files are served by Caddy from `/var/www/quackoslavsoft.ru/curren
 Run `./scripts/deploy.sh` to publish the static files to Hermes. It defaults to
 `root@82.26.193.46`; pass another `user@host` as the argument if server access
 changes. SSH asks for a password if no authorized key is available. The script
-keeps backups of changed files outside the public directory and verifies the
-Russian and English pages and stylesheet over HTTPS. Use
-`./scripts/deploy.sh --dry-run` to see which files would change.
+copies the site with `tar`, keeps a backup of the previous site outside the
+public directory, and verifies the Russian and English pages and stylesheet
+over HTTPS. Use `./scripts/deploy.sh --dry-run` to list the files it would copy.
 
 The website contains no checkout or contact form. License prices appear here;
 checkout and delivery details belong on the individual product sites.

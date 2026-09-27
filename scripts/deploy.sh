@@ -31,11 +31,11 @@ backup_dir=$remote_root/backups/$(date -u +%Y%m%dT%H%M%SZ)-$$
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
-for command in ssh rsync curl cmp mktemp; do
+for command in ssh tar curl cmp mktemp; do
   command -v "$command" >/dev/null || { printf 'Missing command: %s\n' "$command" >&2; exit 1; }
 done
 
-files=(index.html en/index.html styles.css robots.txt sitemap.xml assets/)
+files=(index.html en/index.html styles.css robots.txt sitemap.xml assets)
 tmp_dir=$(mktemp -d /tmp/quackoslav-deploy.XXXXXXXX)
 control_socket=$tmp_dir/ssh.sock
 cleanup() {
@@ -46,23 +46,20 @@ trap cleanup EXIT
 ssh_options=(-o ConnectTimeout=10 -o ControlMaster=auto -o ControlPersist=120 -o "ControlPath=$control_socket")
 
 printf 'Target: %s:%s\n' "$target" "$remote_site"
-ssh "${ssh_options[@]}" "$target" "test -d '$remote_site' && test -w '$remote_site'"
-
-rsync_options=(-rltv --checksum --relative --itemize-changes)
-if [[ $dry_run == true ]]; then
-  rsync_options+=(--dry-run)
-else
-  ssh "${ssh_options[@]}" "$target" "mkdir -p '$backup_dir'"
-  rsync_options+=(--backup --backup-dir="$backup_dir")
-fi
-
-rsync -e "ssh -o ControlMaster=auto -o ControlPersist=120 -o ControlPath=$control_socket" \
-  "${rsync_options[@]}" "${files[@]}" "$target:$remote_site/"
+ssh "${ssh_options[@]}" "$target" \
+  "command -v tar >/dev/null && command -v cp >/dev/null && test -d '$remote_site' && test -w '$remote_site'"
 
 if [[ $dry_run == true ]]; then
+  printf 'Files that would be copied:\n'
+  printf '%s\n' "${files[@]}"
   printf 'Dry run complete; no files changed.\n'
   exit 0
 fi
+
+ssh "${ssh_options[@]}" "$target" \
+  "mkdir -p '$backup_dir' && cp -a '$remote_site/.' '$backup_dir/'"
+COPYFILE_DISABLE=1 tar --no-xattrs -cf - "${files[@]}" | \
+  ssh "${ssh_options[@]}" "$target" "tar -xf - -C '$remote_site'"
 
 verify() {
   local file=$1 url=$2
