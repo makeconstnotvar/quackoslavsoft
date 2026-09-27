@@ -15,4 +15,13 @@ Static bilingual site for `quackoslavsoft.ru`. The Russian page is at `/`; the E
 
 The production files are served by Caddy from `/var/www/quackoslavsoft.ru/current` on the Hermes server. The site block is in `/etc/caddy/Caddyfile`. DNS is managed in Timeweb: the apex A record points to the server; `www` is a CNAME to the apex. Caddy manages HTTPS certificates automatically when DNS resolves publicly.
 
-Copy changed static files to the production directory, validate Caddy if its configuration changed, and check both language routes over HTTPS. The website contains no checkout or contact form; sales details belong on the individual product sites.
+Run `./scripts/deploy.sh` to publish the static files to Hermes. It defaults to
+`root@82.26.193.46`; pass another `user@host` as the argument if server access
+changes. SSH asks for a password if no authorized key is available. The script
+keeps backups of changed files outside the public directory and verifies the
+Russian and English pages and stylesheet over HTTPS. Use
+`./scripts/deploy.sh --dry-run` to see which files would change.
+
+The website contains no checkout or contact form. License prices appear here;
+checkout and delivery details belong on the individual product sites.
+Static-file updates do not require a Caddy reload.
