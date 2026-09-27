@@ -7,7 +7,8 @@ Static bilingual site for `quackoslavsoft.ru`. The Russian page is at `/`; the E
 - `index.html` — Russian page
 - `en/index.html` — English page
 - `styles.css` — shared design
-- `assets/quackoslav-logo.png` — transparent mascot logo
+- `assets/quackoslav-logo.png` — original transparent mascot artwork
+- `assets/quackoslav-hero.webp`, `assets/quackoslav-icon.webp`, `assets/quackoslav-favicon.png`, `assets/quackoslav-social.png` — optimized page and social images
 - `robots.txt`, `sitemap.xml` — indexing metadata
 
 ## Deployment
